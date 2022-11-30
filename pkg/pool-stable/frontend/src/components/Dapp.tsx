@@ -1,24 +1,24 @@
-import contractAddress from "@contracts/contract-address.json";
+import contractAddress from '@contracts/contract-address.json';
 
 // We import the contract's artifacts and address here, as we are going to be
 // using them with ethers
-import { Aave__factory } from "@contracts/typechain-types";
-import { Aave } from "@contracts/typechain-types/contracts/Aave";
-import { JsonRpcProvider } from "@ethersproject/providers";
+import { ComposableStablePool__factory } from '@contracts/typechain-types';
+
+import { JsonRpcProvider } from '@ethersproject/providers';
 
 // We'll use ethers to interact with the Ethereum network and our contract
-import { ethers } from "ethers";
-import React from "react";
-import { ConnectWallet } from "./ConnectWallet";
-import { Loading } from "./Loading";
+import { ethers } from 'ethers';
+import React from 'react';
+import { ComposableStablePool } from '@contracts/typechain-types';
+import { ConnectWallet } from './ConnectWallet';
 
 // All the logic of this dapp is contained in the Dapp component.
 // These other components are just presentational ones: they don't have any
 // logic. They just render HTML.
-import { NoWalletDetected } from "./NoWalletDetected";
-import { TransactionErrorMessage } from "./TransactionErrorMessage";
+import { NoWalletDetected } from './NoWalletDetected';
+import { TransactionErrorMessage } from './TransactionErrorMessage';
 
-import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
+import { WaitingForTransactionMessage } from './WaitingForTransactionMessage';
 
 declare global {
   interface Window {
@@ -29,7 +29,7 @@ declare global {
 // This is the Hardhat Network id that we set in our hardhat.config.js.
 // Here's a list of network ids https://docs.metamask.io/guide/ethereum-provider.html#properties
 // to use when deploying to other networks.
-const HARDHAT_NETWORK_ID = "1337";
+const HARDHAT_NETWORK_ID = '1337';
 
 // This is an error code that indicates that the user canceled a transaction
 const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
@@ -62,7 +62,7 @@ interface DappState {
 export class Dapp extends React.Component<{}, DappState> {
   private _provider?: JsonRpcProvider;
   private initialState?: DappState;
-  private _aave: Aave;
+  private _composableStablePool: ComposableStablePool;
   private _pollDataInterval?: any;
   constructor(props: any) {
     super(props);
@@ -88,15 +88,14 @@ export class Dapp extends React.Component<{}, DappState> {
 
     this._provider.resetEventsBlock(0);
 
-    this._aave = Aave__factory.connect(
-      contractAddress.Aave,
+    this._composableStablePool = ComposableStablePool__factory.connect(
+      contractAddress.StablePool,
       this._provider.getSigner(0)
     );
   }
 
   aaveSupply() {
-    console.log(this._aave);
-    this._aave.supply({ gasLimit: 10000 });
+    console.log(this._composableStablePool);
   }
 
   render() {
@@ -137,9 +136,7 @@ export class Dapp extends React.Component<{}, DappState> {
               for it to be mined.
               If we are waiting for one, we show a message here.
             */}
-            {this.state.txBeingSent && (
-              <WaitingForTransactionMessage txHash={this.state.txBeingSent} />
-            )}
+            {this.state.txBeingSent && <WaitingForTransactionMessage txHash={this.state.txBeingSent} />}
 
             {/* 
               Sending a transaction can fail in multiple ways. 
@@ -176,7 +173,7 @@ export class Dapp extends React.Component<{}, DappState> {
     // To connect to the user's wallet, we have to run this method.
     // It returns a promise that will resolve to the user's address.
     const [selectedAddress] = await window.ethereum.request({
-      method: "eth_requestAccounts",
+      method: 'eth_requestAccounts',
     });
 
     // Once we have the address, we can initialize the application.
@@ -189,7 +186,7 @@ export class Dapp extends React.Component<{}, DappState> {
     this._initialize(selectedAddress);
 
     // We reinitialize it whenever the user changes their account.
-    window.ethereum.on("accountsChanged", ([newAddress]: any) => {
+    window.ethereum.on('accountsChanged', ([newAddress]: any) => {
       this._stopPollingData();
       // `accountsChanged` event can be triggered with an undefined newAddress.
       // This happens when the user removes the Dapp from the "Connected
@@ -203,7 +200,7 @@ export class Dapp extends React.Component<{}, DappState> {
     });
 
     // We reset the dapp state if the network is changed
-    window.ethereum.on("chainChanged", ([networkId]: any) => {
+    window.ethereum.on('chainChanged', ([networkId]: any) => {
       this._stopPollingData();
       this._resetState();
     });
@@ -268,7 +265,7 @@ export class Dapp extends React.Component<{}, DappState> {
     // }
     //
     this.setState({
-      networkError: "Please connect Metamask to Localhost:8545",
+      networkError: 'Please connect Metamask to Localhost:8545',
     });
 
     return true;

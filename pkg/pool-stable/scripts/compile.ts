@@ -18,3 +18,5 @@ function copyFrontendFiles() {
 }
 
 copyFrontendFiles();
+
+console.log('copied all the files');
