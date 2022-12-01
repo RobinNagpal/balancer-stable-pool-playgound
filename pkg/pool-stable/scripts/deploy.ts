@@ -64,7 +64,7 @@ async function deployStablePool() {
 
   fs.writeFileSync(
     path.join(contractsDir, 'contract-address.json'),
-    JSON.stringify({ StablePool: pool.address }, undefined, 2)
+    JSON.stringify({ StablePool: pool.address, Tokens: tokens.tokens.map((token) => token.address) }, undefined, 2)
   );
 }
 
